@@ -17,11 +17,6 @@
 		range = data;
 	});
 
-	function setDates(dates){
-		range.dates=dates.data.date;
-		console.log (range.dates);
-	}
-
 	let course_select = (
 		async () => {
 			// @ts-ignore
@@ -37,6 +32,15 @@
 			return response.json()
 		}
 	)()
+
+	let weeks = (
+		async () => {
+			// @ts-ignore
+			const response = await fetch(url+`week`)
+			return response.json()
+		}
+	)()
+
 
 </script>
 
@@ -60,7 +64,7 @@
 		{#await dates}
 		<p>Bitte warten...</p>
 		{:then dates}
-			{setDates(dates)}
+		
 			Startdatum: 
 			<select  bind:value={range.start}>
 			{#each dates.data.date as option}

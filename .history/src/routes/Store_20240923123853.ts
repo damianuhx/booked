@@ -72,7 +72,6 @@ let rangeStore = writable(
             start: '',
             end: '',
             price: '',
-            planname: '',
         },
         text1: '',
         text2: '',

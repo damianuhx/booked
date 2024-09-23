@@ -24,21 +24,23 @@
 		}
 	)()
 
-	let course_select = (
+
+	let weeks = (
 		async () => {
 			// @ts-ignore
-			const response = await fetch(url+`course`)
-			return response.json()
+			const response = await fetch(url+`week`)
+			return response.data.week.json()
 		}
 	)()
 
-	let dates = (
-		async () => {
-			// @ts-ignore
-			const response = await fetch(url+`date`)
-			return response.json()
+	function startdate (input){
+		if (typeof input.global !== 'undefined'){
+			if (typeof input.global.start_all !== 'undefined'){
+				return input.global.start_all;
+			}
 		}
-	)()
+		return "";
+	}
 
 	function onKeyDown(e) {
 		 switch(e.keyCode) {
@@ -54,69 +56,40 @@
 	function onKeyUp(e) {
 		range.rerender=!range.rerender;
 		range.key=0;
-		range.invoice_text='jjj';
+		range.invoice_text='';
 	}
 
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="KV3" />
-</svelte:head>
-
 <svelte:window on:keydown={onKeyDown} on:keyup|preventDefault={onKeyUp} />
 
 
-{#if !range.selected}
-	{#await course_select}
-	<p>Bitte warten...</p>
-	{:then course_select}
-	{range.course}: {range.start} - {range.end}
-	Kurs: 
-	<select bind:value={range.course}>
-		{#each course_select.data.course as option}
-		<option value="{parseInt(option.id)}">{option.name}</option>
-		{/each}
-	</select>
-	<br/>
-		{#await dates}
-		<p>Bitte warten...</p>
-		{:then dates}
-		
-			Startdatum: 
-			<select  bind:value={range.start}>
-			{#each dates.data.date as option}
-				{#if !parseInt(option.exit)}
-					<option value="{parseInt(option.week)}">{option.name} | ab {range.week_start(option.week)} ({option.week})</option>
-				{/if}
-			{/each}
-		</select>
-		<br/>
-		Enddatum:
-		<select bind:value={range.end} name="cars" id="cars">
-			{#each dates.data.date as option}
-				{#if parseInt(option.exit)}
-					<option value="{parseInt(option.week)}">{option.name} | bis {range.week_end(option.week)} ({option.week})</option>
-				{/if}
-			{/each}
-		</select>
-		<br/>
-	  {#if range.course>0&&range.start>0 && range.end>0}
-	  <button style="width: 300px;" on:click={()=>{if(range.course>0&&range.start>0 && range.end>0) {range.selected=true; range.rerender!=range.rerender;}}}>Anzeigen</button> 
-	  {/if}
-	  	{:catch error}
-			<p>{error}</p>
-		{/await}
-{:catch error}
-		<p>{error}</p>
+{#await weeks}
+		<p>Lade Kurs Wochen...</p>
+	{:then courses}
+		{console.log(weeks)}
 	{/await}
-{:else}
+
 	{#await courses}
-		<p>Lade Kurse... Bitte warten...</p>
+		<p>Lade Kurs {range.course}... Bitte warten...</p>
 	{:then courses}
 	<img class="logo" src={logo} alt="EXAMPREP"/>
-			<input class="title" type="text" value="{courses.data.course[0].name}"><br/>
-			<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50"></textarea>
+			<input style="margin-top: 10px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
+			Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
+			<!--Kursumfang: 
+			{#if range.selected_visit == range.selected_watch}
+				{range.selected_visit} Lektionen <br/><br/>
+			{:else}
+				{range.selected_visit} Lektionen und {range.selected_watch} Aufzeichnungen.<br/>
+			{/if}-->
+			<br/>
+			<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
+Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
+Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
+Bei allen Fächern ist der Zugang zum Lernsystem mit allen Lernunterlagen und Aufzeichnungen inbegriffen.
+
+			</textarea>
+			
 		{#key range.rerender}
 			<header>
 				<div class=sticky>
@@ -130,11 +103,11 @@
 			</header>
 			<Table {courses}/>
 		{/key}
-		<textarea class="desc" id="w3review" name="w3review" cols="50"></textarea>
+		
 	{:catch error}
 		<p>{error}</p>
 	{/await}
-{/if}
+
 
 <style>
 
@@ -157,6 +130,9 @@
 		border-style: hidden;
 	}
 
+	textarea{
+			resize: none;
+		}
 
 	header {
 		margin-top: -10px;
@@ -180,5 +156,4 @@
 		}
 	}
 
-	select{width: 300px;}
 </style>

@@ -93,7 +93,6 @@
 			range.rerender=!range.rerender;
 			range.header.start=range.week_start(week);
 			range.header.end=range.week_end(week);
-			range.header.planname=range.weeks[week].plan.name;
 			
 
 			return input;
@@ -153,8 +152,6 @@ function calc(subject) {
 				if (typeof subject.data[index].b_visit == "undefined") {subject.data[index].b_visit = true;}
 				if (typeof subject.data[index].b_watch == "undefined") {subject.data[index].b_watch = true;}
 				if (typeof subject.data[index].b_self == "undefined") {subject.data[index].b_self = true;}
-				//if (subject.data[index].b_visit == true){subject.data[index].b_watch = true;}
-				/*if (subject.data[index].b_watch == false){subject.data[index].b_visit = false;}*/
 		});
 
 		//set base price 
@@ -342,7 +339,7 @@ function calc(subject) {
 	{#if typeof subject.data !== "undefined"}
 		<div class="square-row no-print">
 		{#each Object.entries(subject.data) || [] as [week, value]}
-				<div style="background-color: {range.weeks[week].plan.color} !important" aria-hidden=true on:mouseenter={()=>{value=change(value, 'all', week)}} class="square week" >{range.infcount(week)}</div>
+				<div aria-hidden=true on:mouseenter={()=>{value=change(value, 'all', week)}} class="square week" >{range.infcount(week)}</div>
 		{/each}
 		</div>
 	{/if}

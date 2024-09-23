@@ -34,19 +34,12 @@
 	)()
 
 	function setWeeks(weeks){
+		console.log(range.weeks);
 		range.weeks=[];
 		weeks.forEach((element) => {
 			range.weeks[element.week] = element;
 		});
-		range.dates.forEach((element) => {
-			if (parseInt(element.exit)==0){
-				range.weeks[element.week].entry = element.name;
-			}
-			else{
-				range.weeks[element.week].exit = element.name;
-			}
-		});
-		//console.log(range.weeks);
+		console.log(range.weeks);
 	}
 
 	function startdate (input){

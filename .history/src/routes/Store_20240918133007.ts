@@ -13,7 +13,6 @@ let rangeStore = writable(
         show: true,
         rerender: true,
         reheader: true,
-        weeks: [],
         all: function () {
             let value = [];
             for (let i = this.start; i<=this.end; i++){
@@ -21,13 +20,13 @@ let rangeStore = writable(
             }
             return value;
         },
-        /*array: function (array: any[]) {
+        array: function (array: any[]) {
             let result = [];
             for (let i = this.start; i<=this.end; i++){
                 result.push(makeEntry(array,i));
             }
             return result;
-        },*/
+        },
         sum: function (input: any[], key: string, active: string){
             let returnvalue = 0;
             Object.entries(input).forEach((value)=>{
@@ -72,7 +71,6 @@ let rangeStore = writable(
             start: '',
             end: '',
             price: '',
-            planname: '',
         },
         text1: '',
         text2: '',
@@ -83,7 +81,7 @@ let rangeStore = writable(
 export default rangeStore;
 
 
-//type NewType = any[];
+type NewType = any[];
 
 	/**
 	* 
@@ -91,10 +89,8 @@ export default rangeStore;
 	* @param {object} array = the array of all booked entries for the subject
 	* returns the booked entry if it is found or an empty booked instance
    	*/
-       /*function makeEntry(array: NewType, day: number){
-		let result = {vistit: false, watch: false, portal: false, subject: {
-            id: 1 //hier subject id einfügen
-        }};
+       function makeEntry(array: NewType, day: number){
+		let result = {vistit: false, watch: false, portal: false, subject: {id: 1 /*hier subject id einfügen*/}};
 		let keys=Object.keys(array);
 		keys.forEach((key) => {
             // @ts-ignore
@@ -104,4 +100,4 @@ export default rangeStore;
 			}
 		});
 		return result;
-	};*/
+	};

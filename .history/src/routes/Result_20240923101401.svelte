@@ -29,25 +29,10 @@
 		async () => {
 			// @ts-ignore
 			const response = await fetch(url+`week`)
+			console.log(response.json());
 			return response.json()
 		}
 	)()
-
-	function setWeeks(weeks){
-		range.weeks=[];
-		weeks.forEach((element) => {
-			range.weeks[element.week] = element;
-		});
-		range.dates.forEach((element) => {
-			if (parseInt(element.exit)==0){
-				range.weeks[element.week].entry = element.name;
-			}
-			else{
-				range.weeks[element.week].exit = element.name;
-			}
-		});
-		//console.log(range.weeks);
-	}
 
 	function startdate (input){
 		if (typeof input.global !== 'undefined'){
@@ -84,11 +69,7 @@
 	{#await courses}
 		<p>Lade Kurs {range.course}... Bitte warten...</p>
 	{:then courses}
-	{#await weeks}
-		<p>Lade Kurs Wochen...</p>
-	{:then weeks}
-		{setWeeks(weeks.data.week)}
-		<img class="logo" src={logo} alt="EXAMPREP"/>
+	<img class="logo" src={logo} alt="EXAMPREP"/>
 			<input style="margin-top: 10px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
 			Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
 			<!--Kursumfang: 
@@ -102,6 +83,7 @@
 Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
 Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
 Bei allen Fächern ist der Zugang zum Lernsystem mit allen Lernunterlagen und Aufzeichnungen inbegriffen.
+
 			</textarea>
 			
 		{#key range.rerender}
@@ -110,7 +92,6 @@ Bei allen Fächern ist der Zugang zum Lernsystem mit allen Lernunterlagen und Au
 					<button onClick="window.print()">Drucken</button> 
 					Woche: {range.header.start} - {range.header.end}
 					Preis: {range.header.price}
-					Stundenplan: {range.header.planname}
 					CTRL: Auswählen, OPTION: Abwählen
 					<input class="no-print" type="checkbox" bind:checked={range.show}/>Details
 				</div>
@@ -122,7 +103,7 @@ Bei allen Fächern ist der Zugang zum Lernsystem mit allen Lernunterlagen und Au
 	{:catch error}
 		<p>{error}</p>
 	{/await}
-	{/await}
+
 
 <style>
 

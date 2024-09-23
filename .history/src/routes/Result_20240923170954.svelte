@@ -46,7 +46,7 @@
 				range.weeks[element.week].exit = element.name;
 			}
 		});
-		//console.log(range.weeks);
+		console.log(range.weeks);
 	}
 
 	function startdate (input){

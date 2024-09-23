@@ -93,7 +93,6 @@
 			range.rerender=!range.rerender;
 			range.header.start=range.week_start(week);
 			range.header.end=range.week_end(week);
-			range.header.planname=range.weeks[week].plan.name;
 			
 
 			return input;
@@ -342,7 +341,8 @@ function calc(subject) {
 	{#if typeof subject.data !== "undefined"}
 		<div class="square-row no-print">
 		{#each Object.entries(subject.data) || [] as [week, value]}
-				<div style="background-color: {range.weeks[week].plan.color} !important" aria-hidden=true on:mouseenter={()=>{value=change(value, 'all', week)}} class="square week" >{range.infcount(week)}</div>
+				<!--{range.weeks[week].plan.name}-->
+				<div style="background-color: {range.weeks[week].plan.color}" aria-hidden=true on:mouseenter={()=>{value=change(value, 'all', week)}} class="square week" >{range.infcount(week)}</div>
 		{/each}
 		</div>
 	{/if}

@@ -342,6 +342,7 @@ function calc(subject) {
 	{#if typeof subject.data !== "undefined"}
 		<div class="square-row no-print">
 		{#each Object.entries(subject.data) || [] as [week, value]}
+				
 				<div style="background-color: {range.weeks[week].plan.color} !important" aria-hidden=true on:mouseenter={()=>{value=change(value, 'all', week)}} class="square week" >{range.infcount(week)}</div>
 		{/each}
 		</div>

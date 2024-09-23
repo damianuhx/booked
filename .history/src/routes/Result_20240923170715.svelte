@@ -39,14 +39,8 @@
 			range.weeks[element.week] = element;
 		});
 		range.dates.forEach((element) => {
-			if (parseInt(element.exit)==0){
-				range.weeks[element.week].entry = element.name;
-			}
-			else{
-				range.weeks[element.week].exit = element.name;
-			}
+			range.weeks[element.week].date = element.name;
 		});
-		//console.log(range.weeks);
 	}
 
 	function startdate (input){

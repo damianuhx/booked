@@ -60,7 +60,7 @@
 		{#await dates}
 		<p>Bitte warten...</p>
 		{:then dates}
-			{setDates(dates)}
+			{setDates()}
 			Startdatum: 
 			<select  bind:value={range.start}>
 			{#each dates.data.date as option}

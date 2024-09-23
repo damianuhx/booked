@@ -13,7 +13,6 @@ let rangeStore = writable(
         show: true,
         rerender: true,
         reheader: true,
-        weeks: [],
         all: function () {
             let value = [];
             for (let i = this.start; i<=this.end; i++){
@@ -72,7 +71,6 @@ let rangeStore = writable(
             start: '',
             end: '',
             price: '',
-            planname: '',
         },
         text1: '',
         text2: '',

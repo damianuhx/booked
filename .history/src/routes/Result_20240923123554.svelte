@@ -34,19 +34,12 @@
 	)()
 
 	function setWeeks(weeks){
+		console.log(range.weeks);
 		range.weeks=[];
 		weeks.forEach((element) => {
 			range.weeks[element.week] = element;
 		});
-		range.dates.forEach((element) => {
-			if (parseInt(element.exit)==0){
-				range.weeks[element.week].entry = element.name;
-			}
-			else{
-				range.weeks[element.week].exit = element.name;
-			}
-		});
-		//console.log(range.weeks);
+		console.log(range.weeks);
 	}
 
 	function startdate (input){
@@ -110,7 +103,6 @@ Bei allen Fächern ist der Zugang zum Lernsystem mit allen Lernunterlagen und Au
 					<button onClick="window.print()">Drucken</button> 
 					Woche: {range.header.start} - {range.header.end}
 					Preis: {range.header.price}
-					Stundenplan: {range.header.planname}
 					CTRL: Auswählen, OPTION: Abwählen
 					<input class="no-print" type="checkbox" bind:checked={range.show}/>Details
 				</div>
