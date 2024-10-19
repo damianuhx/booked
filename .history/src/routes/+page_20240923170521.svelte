@@ -41,7 +41,7 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>Kurse</title>
 	<meta name="description" content="KV3" />
 </svelte:head>
 

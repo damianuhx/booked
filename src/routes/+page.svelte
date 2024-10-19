@@ -19,7 +19,6 @@
 
 	function setDates(dates){
 		range.dates=dates.data.date;
-		console.log (range.dates);
 	}
 
 	let course_select = (
@@ -41,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>Kurse</title>
 	<meta name="description" content="KV3" />
 </svelte:head>
 
@@ -92,7 +91,34 @@
 	<Result/>
 {/if}
 
+
+	
+	
+<footer class="only-printx" style="
+width: 600px;
+position: relative !important; bottom: 0;
+font-size: 0.7rem !important;
+margin-right: 3rem !important;
+padding: 10px;
+border-style: ridge;
+">
+<div style="width: 100%;font-size: 0.7rem !important;"> <div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Schule:</div> ExamPrep <span class="red">//</span> Bändlistr. 31 <span class="red">//</span> 8064 Zürich </div>
+<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Verwaltung: </div> ExamPrep GmbH <span class="red">//</span> Parkweg 5 <span class="red">//</span> 8800 Thalwil <span class="red">//</span> info@examprep.ch </div>
+<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Kontakt: </div> Tel +41 44 720 06 67 <span class="red">//</span> info@examprep.ch <span class="red">//</span> www.examprep.ch </div>
+<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Bankverbindung: </div> ZKB (Zürcher Kantonalbank) <span class="red">//</span>  8010 Zürich <span class="red">//</span> IBAN: CH22 0070 0110 0026 2134 9 
+<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red"> </div> Swift: ZKBKCHZZ80A <span class="red">//</span> Bankenclearing (BC): 700 <span class="red">//</span>  Post-Konto: 80-151-4</div>
+<img style="margin: 10px;" src="https://pics.excards.ch/eduqua sw.png" height="30" alt="Verband Schweizerischer Privatschulen"/> <img style="margin: 10px;"  src="https://pics.excards.ch/vsp_logo.png" height="30" alt="Verband Schweizerischer Privatschulen"/>
+</footer>
+
+
+
 <style>
+
+
+.lt {
+        width: 140px; display: inline-block; min-width: 80px; margin-bottom: 10px !important;
+    }
+	.red {color: red}
 
 	*{font-family: 'Roboto', Tahoma, Arial;}
 	.upper-space {height: 50px;}
@@ -130,9 +156,16 @@
 		left: 0;
 	}
 
+	.only-print{
+			display: none;
+		}
+
 	@media print {
 		.sticky{
 			display: none;
+		}
+		.only-print{
+			display: block;
 		}
 	}
 
