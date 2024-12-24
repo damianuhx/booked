@@ -83,7 +83,6 @@ let rangeStore = writable(
 
 export default rangeStore;
 
-
 //type NewType = any[];
 
 	/**

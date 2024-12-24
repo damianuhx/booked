@@ -6,8 +6,19 @@
         import rangeStore from './Store';
 
         export let courses;
+
+        let range; 
+        
+        rangeStore.subscribe((data)=>{
+		    range = data;
+	    });
+
     </script>
+
+
     <div class="table">
+        {console.log('test')}
+        {console.log(courses.data.course[0])}
         <Row bind:subject={courses.data.course[0]} layer={0} show=true parent_global={{visit: true, watch: true, self: true}}/>
      </div>
 

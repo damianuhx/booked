@@ -6,13 +6,20 @@
 	import Table from './Table.svelte';
 	// @ts-ignore
 	import { onMount } from 'svelte';
+	import { serialize } from "cookie";
 	import rangeStore from './Store';
 	import logo from '$lib/images/examprep.png';
+	import { page } from '$app/stores';
 
 	let range;
-	let url = 'https://api2.excards.ch/';
+	//let url = 'https://api2.excards.ch/';
+	let url = 'http://localhost:8888/datian-api/';
 	//let rerender = true;
 
+	const url_para = $page.url;
+	console.log(url_para.searchParams.get('id'));
+	let student_id = url_para.searchParams.get('id');
+	
 	rangeStore.subscribe((data)=>{
 		range = data;
 	});
@@ -29,6 +36,46 @@
 		}
 	)()
 
+
+	let saves = (
+		async () => {
+			// @ts-ignore
+			const response = await fetch(url+`save?id=`+student_id);
+			let data = response.json();
+			return data;
+		}
+	)()
+
+	var saves_array=[];
+	let save_selected={};
+
+	function transform_saves(saves){
+		let result=saves.data.save;
+		let return_value=[];
+		
+		result.forEach((element) => {
+			return_value.push({
+				id: element.id,
+				name: element.name,
+				student_id: element.student_id,
+				data: JSON.parse(element.data),
+			});
+		});
+		return_value.forEach((element)=>{
+
+		});
+		return return_value;
+	}
+
+	function save2range(save_id, saves_array){
+		for (const [key, value] of Object.entries(saves_array[save_id].data)) {
+    		range[key]=value;
+		}
+		range.loaded_courses=saves_array[save_id];
+		range.loaded_weeks=saves_array[save_id];
+		console.log(range);
+	}
+
 	let dates = (
 		async () => {
 			// @ts-ignore
@@ -36,7 +83,7 @@
 			return response.json()
 		}
 	)()
-
+	
 </script>
 
 <svelte:head>
@@ -44,53 +91,90 @@
 	<meta name="description" content="KV3" />
 </svelte:head>
 
-{#if !range.selected}
-	{#await course_select}
-	<p>Bitte warten...</p>
-	{:then course_select}
-	{range.course}: {range.start} - {range.end}
-	Kurs: 
-	<select bind:value={range.course}>
-		{#each course_select.data.course as option}
-		<option value="{parseInt(option.id)}">{option.name}</option>
-		{/each}
-	</select>
-	<br/>
-		{#await dates}
+{#if student_id>0}
+	{#await saves}
 		<p>Bitte warten...</p>
-		{:then dates}
-			{setDates(dates)}
-			Startdatum: 
-			<select  bind:value={range.start}>
-			{#each dates.data.date as option}
-				{#if !parseInt(option.exit)}
-					<option value="{parseInt(option.week)}">{option.name} | ab {range.week_start(option.week)} ({option.week})</option>
-				{/if}
+	{:then saves}
+	{console.log('saves_array')}
+		{console.log(saves_array)}
+		{saves_array=transform_saves(saves)}
+		{console.log(saves_array)}
+		{#await saves_array}
+			<p>Bitte warten...</p>
+		{:then saves_array}
+			<select bind:value={save_selected}>
+				{#each saves_array as option, key}
+				{console.log(option)}
+				<option value="{parseInt(key)}">{option.name}</option>
+				{/each}
+			</select>
+			<button style="width: 300px;" on:click={()=>{
+				console.log(saves_array);
+				save2range(save_selected, saves_array); 
+				range.selected=true; 
+				range.rerender!=range.rerender;
+			}}>Anzeigen</button> 
+		{/await}
+	{/await}
+	{#if range.selected}
+		{console.log(range.course)}{console.log(range)}
+		
+		<Result/>
+	{/if}
+{:else}
+	{#if !range.selected}
+		{#await course_select}
+		<p>Bitte warten...</p>
+		{:then course_select}
+		{range.course}: {range.start} - {range.end}
+		Kurs: 
+		<select bind:value={range.course}>
+			{#each course_select.data.course as option}
+			<option value="{parseInt(option.id)}">{option.name}</option>
 			{/each}
 		</select>
 		<br/>
-		Enddatum:
-		<select bind:value={range.end} name="cars" id="cars">
-			{#each dates.data.date as option}
-				{#if parseInt(option.exit)}
-					<option value="{parseInt(option.week)}">{option.name} | bis {range.week_end(option.week)} ({option.week})</option>
-				{/if}
-			{/each}
-		</select>
-		<br/>
-	  {#if range.course>0&&range.start>0 && range.end>0}
-	  <button style="width: 300px;" on:click={()=>{if(range.course>0&&range.start>0 && range.end>0) {range.selected=true; range.rerender!=range.rerender;}}}>Anzeigen</button> 
-	  {/if}
-	  	{:catch error}
+			{#await dates}
+			<p>Bitte warten...</p>
+			{:then dates}
+				{setDates(dates)}
+				Startdatum: 
+				<select  bind:value={range.start}>
+				{#each dates.data.date as option}
+					{#if !parseInt(option.exit)}
+						<option value="{parseInt(option.week)}">{option.name} | ab {range.week_start(option.week)} ({option.week})</option>
+					{/if}
+				{/each}
+			</select>
+			<br/>
+			Enddatum:
+			<select bind:value={range.end} name="cars" id="cars">
+				{#each dates.data.date as option}
+					{#if parseInt(option.exit)}
+						<option value="{parseInt(option.week)}">{option.name} | bis {range.week_end(option.week)} ({option.week})</option>
+					{/if}
+				{/each}
+			</select>
+			<br/>
+		{#if range.course>0&&range.start>0 && range.end>0}
+		<button style="width: 300px;" on:click={()=>{if(range.course>0&&range.start>0 && range.end>0) {range.selected=true; range.rerender!=range.rerender;}}}>Anzeigen</button> 
+		{/if}
+			{:catch error}
+				<p>{error}</p>
+			{/await}
+	{:catch error}
 			<p>{error}</p>
 		{/await}
-{:catch error}
-		<p>{error}</p>
-	{/await}
-{:else}
-	<Result/>
+	{:else}
+	<!--
+	<div style="margin-top: 2rem">
+		<input style="width: 30%" bind:value={save.name} placeholder="enter your name" />
+		<button style="width: 30%" type="button" on:click={()=>{save2db()}}>Speichern</button> 
+	</div>
+	-->
+		<Result/>
+	{/if}
 {/if}
-
 
 	
 	

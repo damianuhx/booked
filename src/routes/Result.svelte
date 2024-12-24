@@ -9,7 +9,8 @@
 	import logo from '$lib/images/examprep.png';
 
 	let range;
-	let url = 'https://api2.excards.ch/';
+	//let url = 'https://api2.excards.ch/';
+	let url = 'http://localhost:8888/datian-api/';
 	//let rerender = true;
 
 	rangeStore.subscribe((data)=>{
@@ -18,11 +19,21 @@
 
 	let courses = (
 		async () => {
+			let returnvalue={};
+			console.log('load courses');
 			// @ts-ignore
-			const response = await fetch(url+`all//`+range.course+`/`+range.start+`/`+range.end)
-			return response.json()
+			if (typeof range.loaded_courses !== 'undefined'){
+				returnvalue.data = {course: [range.loaded_courses.data]};
+			}
+			else{
+				const response = await fetch(url+`all//`+range.course+`/`+range.start+`/`+range.end);
+				returnvalue = response.json();
+			}
+			console.log(returnvalue);
+			//console.log(returnvalue.data.course[0]);
+			return returnvalue;
 		}
-	)()
+	)();
 
 
 	let weeks = (
@@ -31,7 +42,7 @@
 			const response = await fetch(url+`week`)
 			return response.json()
 		}
-	)()
+	)();
 
 	function setWeeks(weeks){
 		range.weeks=[];
@@ -75,6 +86,49 @@
 		range.invoice_text='';
 	}
 
+	async function save2db () {
+			// @ts-ignore
+			let thiscourses;
+			let thisweeks;
+
+			weeks.then((value)=>{
+				thisweeks=value.data;
+				courses.then(async (value)=>{
+					thiscourses=value.data;
+					let body= JSON.stringify({
+						data:  JSON.stringify(range),
+						courses:  JSON.stringify(thiscourses),
+						weeks:  JSON.stringify(thisweeks),
+						student_id: 77,
+						name: save.name,}
+			);
+
+			const response = await fetch(url+`save`,
+                {
+                    method: 'PUT',
+                    body: body,
+                }
+            );
+
+			const result = await response.json();
+			return result;
+			});
+		});
+		}
+	//Saving
+	let save = {
+		name: 'test',
+	};
+
+	function save2courses(save_id, saves_array){
+		//range=saves[save_id];
+		for (const [key, value] of Object.entries(saves_array[save_id].data)) {
+    		range[key]=value;
+			console.log(`Key: ${key}, Value: ${value}`);
+		}
+	}
+
+
 </script>
 
 <svelte:window on:keydown={onKeyDown} on:keyup|preventDefault={onKeyUp} />
@@ -84,50 +138,57 @@
 	{#await courses}
 		<p>Lade Kurs {range.course}... Bitte warten...</p>
 	{:then courses}
-	{#await weeks}
-		<p>Lade Kurs Wochen...</p>
-	{:then weeks}
-		{setWeeks(weeks.data.week)}
-		<img class="logo" src={logo} alt="EXAMPREP"/>
-			<input style="margin-top: 80px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
-			Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
-			<!--Kursumfang: 
-			{#if range.selected_visit == range.selected_watch}
-				{range.selected_visit} Lektionen <br/><br/>
-			{:else}
-				{range.selected_visit} Lektionen und {range.selected_watch} Aufzeichnungen.<br/>
-			{/if}-->
-			<br/>
-			<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
-Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
-Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
-Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.
-			</textarea>
-			
-		{#key range.rerender}
-			<header>
-				<div class=sticky>
-					<button style="font-weight: 700" onClick="window.print()">Drucken</button> <span class="red">//</span>
-					Woche: <b>{range.header.start} - {range.header.end}</b> <span class="red">//</span>
-					Preis: <b>{range.header.price}</b> <span class="red">//</span>
-					Stundenplan: <b>{range.header.planname}</b> <span class="red">//</span>
-					
-					<b>{range.header.exitname} {range.header.entryname}</b> <span class="red">//</span>
-					<input class="no-print" type="checkbox" bind:checked={range.show}/>Details <span class="red">//</span>
-					<input class="no-print" type="checkbox" bind:checked={range.intern}/>Interne Preise <span class="red">//</span>
-					<b>control:</b> Auswählen <span class="red">//</span> <b>option:</b> Abwählen <span class="red">//</span>
-				</div>
-				<div class="upper-space"></div>
-			</header>
-			<Table {courses}/>
-		{/key}
-		<br/><textarea class="desc" id="w3review" name="w3review" cols="149">
-		Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
-			</textarea>
-			<br/>
-	{:catch error}
-		<p>{error}</p>
-	{/await}
+		{#await weeks}
+			<p>Lade Kurs Wochen...</p>
+		{:then weeks}
+			{setWeeks(weeks.data.week)}
+			{console.log('weeks')}
+			{console.log(weeks)}
+			<div style="margin-top: 2rem">
+				<input style="width: 30%" bind:value={save.name} placeholder="enter your name" />
+				<button style="width: 30%" type="button" on:click={()=>{save2db()}}>Speichern</button> 
+			</div>
+
+			<img class="logo" src={logo} alt="EXAMPREP"/>
+				<input style="margin-top: 80px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
+				Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
+				<!--Kursumfang: 
+				{#if range.selected_visit == range.selected_watch}
+					{range.selected_visit} Lektionen <br/><br/>
+				{:else}
+					{range.selected_visit} Lektionen und {range.selected_watch} Aufzeichnungen.<br/>
+				{/if}-->
+				<br/>
+				<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
+					Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
+					Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
+					Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.
+				</textarea>
+				
+			{#key range.rerender}
+				<header>
+					<div class=sticky>
+						<button style="font-weight: 700" onClick="window.print()">Drucken</button> <span class="red">//</span>
+						Woche: <b>{range.header.start} - {range.header.end}</b> <span class="red">//</span>
+						Preis: <b>{range.header.price}</b> <span class="red">//</span>
+						Stundenplan: <b>{range.header.planname}</b> <span class="red">//</span>
+						
+						<b>{range.header.exitname} {range.header.entryname}</b> <span class="red">//</span>
+						<input class="no-print" type="checkbox" bind:checked={range.show}/>Details <span class="red">//</span>
+						<input class="no-print" type="checkbox" bind:checked={range.intern}/>Interne Preise <span class="red">//</span>
+						<b>control:</b> Auswählen <span class="red">//</span> <b>option:</b> Abwählen <span class="red">//</span>
+					</div>
+					<div class="upper-space"></div>
+				</header>
+				<Table {courses}/>
+			{/key}
+			<br/><textarea class="desc" id="w3review" name="w3review" cols="149">
+			Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
+				</textarea>
+				<br/>
+		{:catch error}
+			<p>{error}</p>
+		{/await}
 	{/await}
 
 <style>
