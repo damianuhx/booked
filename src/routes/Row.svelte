@@ -1,6 +1,7 @@
 <script>
 // @ts-nocheck
 
+	//initialize
 	import Row from './Row.svelte';
 	import { onMount } from 'svelte';
 	import rangeStore from './Store';
@@ -14,6 +15,17 @@
 
 	let range;
 
+	rangeStore.subscribe((data)=>{
+		range = data;
+	});
+
+
+
+	//functions for layout/style
+	function capitalizeFirstLetter(string) {
+    	return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
 	function bool2noprint(value){
 		if (!value){return 'no-print';}
 		else {return ''}
@@ -23,14 +35,6 @@
 		if (!value){return 'greyed';}
 		else {return ''}
 	}
-
-	function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-	rangeStore.subscribe((data)=>{
-		range = data;
-	});
 
 	function dateColor(week){
 		if (typeof range.weeks[week].entry !== 'undefined'){
@@ -62,6 +66,9 @@
 		}
 	}
 
+
+
+	//select/deselect single weeks
 	function change (input, change, week=0){
 			if (range.key==17){
 				if (change=='visit'){
@@ -118,20 +125,20 @@
 			return input;
 		}
 
-function calc(subject) {
-	//
-}
+
+
+	//main code 
 	onMount(() => 
 	{
-
+		//initialize data, global, show
 		if (typeof subject.data == "undefined") {subject.data = {};}
 		if (typeof subject.global == "undefined") {subject.global = {};}
 		if (typeof subject.show == "undefined") {subject.show=show;}
+
 		// prefix:
 		// b_ = boolean = is the entry counted or not
 		// n_ = number = the number of lessons in each week (for watch and visit)
 		// p_ = price = price of the week (for self, ??? also for watch and visit?)
-
 
 		//bool:active for 1.all, 2.visit, 3.watch, 4.self, only set if not already set
 		if (typeof subject.global.all == "undefined") {
@@ -141,7 +148,8 @@ function calc(subject) {
 			else{
 				subject.global.all = true;
 			}
-		} //is the row active or not
+		} 
+		//is the row active or not
 		if (typeof subject.global.visit == "undefined") {subject.global.visit = true;} //is the visit/Präsenz part of the row active
 		if (typeof subject.global.watch == "undefined") {subject.global.watch = true;} //is the watch/aufzeichnung  part of the row active
 		if (typeof subject.global.self == "undefined") {subject.global.self = true;} //is the self study/Selbststudium part of the row active
@@ -172,8 +180,6 @@ function calc(subject) {
 				if (typeof subject.data[index].b_visit == "undefined") {subject.data[index].b_visit = true;}
 				if (typeof subject.data[index].b_watch == "undefined") {subject.data[index].b_watch = true;}
 				if (typeof subject.data[index].b_self == "undefined") {subject.data[index].b_self = true;}
-				//if (subject.data[index].b_visit == true){subject.data[index].b_watch = true;}
-				/*if (subject.data[index].b_watch == false){subject.data[index].b_visit = false;}*/
 		});
 
 		//set base price 
@@ -185,7 +191,6 @@ function calc(subject) {
 			subject.global.p_base = 0
 		}
 			
-		
 		//add values from all children
 		subject.children.forEach((child)=>{
 			range.all().forEach((index)=>{	
@@ -240,6 +245,7 @@ function calc(subject) {
 				subject.data[index].c_watch=false;
 			}
 		});
+		
 		//row calculations
 		//add up:
 		// lessons: watch, visit
@@ -252,8 +258,7 @@ function calc(subject) {
 		subject.global.p_self += (parent_global.self ? subject.global.p_base * subject.global.b_base : 0);
 
 		subject.global.p_all = subject.global.p_watch*subject.global.watch+subject.global.p_visit*subject.global.visit+subject.global.p_self*subject.global.self;
-		// min/max week
-		//console.log(subject);
+
 		subject.global.start_visit = range.min(subject.data, 'b_visit');
 		subject.global.end_visit = range.max(subject.data, 'b_visit');
 		subject.global.start_watch = range.min(subject.data, 'b_watch');
@@ -307,11 +312,23 @@ function calc(subject) {
 				}
 				range.invoice_text+= '<span style="color: red"> // </span> <br/>';
 			}
-		
 		}
 
-	});
-		
+		//export
+		if (typeof subject.subject !== 'undefined' && typeof subject.subject.id !== 'undefined') {
+			range.export2crm[subject.subject.id]=[];
+			
+			if (typeof subject.data === 'object' && !Array.isArray(subject.data) && subject.data !== null){
+				Object.keys(subject.data).forEach(key => {
+					  range.export2crm[subject.subject.id][key]={};
+
+					  range.export2crm[subject.subject.id][key].visit=subject.data[key].b_visit && subject.data[key].parent_visit;
+					  range.export2crm[subject.subject.id][key].watch=subject.data[key].b_watch && subject.data[key].parent_watch; 
+					  range.export2crm[subject.subject.id][key].self=subject.data[key].b_self && subject.data[key].parent_self;
+				});
+			}
+		}
+	});	
 </script>
 
 {#if typeof subject.global !== "undefined" && show}
@@ -472,7 +489,7 @@ function calc(subject) {
 
 
 {#each subject.children as child}
-	<Row subject={child} layer={layer+1} show={subject.show && show && subject.global.all} parent_global={{visit: parent_global.visit && subject.global && subject.global.visit, watch: parent_global.watch && subject.global && subject.global.watch, self: parent_global.self && subject.global && subject.global.self}} />	 
+	<Row bind:subject={child} layer={layer+1} show={subject.show && show && subject.global.all} parent_global={{visit: parent_global.visit && subject.global && subject.global.visit, watch: parent_global.watch && subject.global && subject.global.watch, self: parent_global.self && subject.global && subject.global.self}} />	 
 {/each}
 
 

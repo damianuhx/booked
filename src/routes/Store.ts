@@ -2,19 +2,22 @@ import { writable } from 'svelte/store'
 
 let rangeStore = writable(
     {
-        course: 13, //13
-        start: 86, //70
-        end: 106, //90
-        selected_start: 86, //70
-        selected_end: 150, //90
-        selected_visit: 0, //70
-        selected_watch: 0, //90
+        url: 'http://localhost:8888/datian-api/', 
+        urlx: 'https://api2.excards.ch/', 
+        course: 13,
+        start: 86,
+        end: 106,
+        selected_start: 86, 
+        selected_end: 150,
+        selected_visit: 0,
+        selected_watch: 0,
         selected: false,
         show: true,
         intern: true,
         rerender: true,
         reheader: true,
         weeks: [],
+        export2crm: [],
         all: function () {
             let value = [];
             for (let i = this.start; i<=this.end; i++){
@@ -22,13 +25,6 @@ let rangeStore = writable(
             }
             return value;
         },
-        /*array: function (array: any[]) {
-            let result = [];
-            for (let i = this.start; i<=this.end; i++){
-                result.push(makeEntry(array,i));
-            }
-            return result;
-        },*/
         sum: function (input: any[], key: string, active: string){
             let returnvalue = 0;
             Object.entries(input).forEach((value)=>{
@@ -82,26 +78,3 @@ let rangeStore = writable(
 );
 
 export default rangeStore;
-
-//type NewType = any[];
-
-	/**
-	* 
-   	* @param {number} day = the day a booked entry is looked for in array
-	* @param {object} array = the array of all booked entries for the subject
-	* returns the booked entry if it is found or an empty booked instance
-   	*/
-       /*function makeEntry(array: NewType, day: number){
-		let result = {vistit: false, watch: false, portal: false, subject: {
-            id: 1 //hier subject id einfügen
-        }};
-		let keys=Object.keys(array);
-		keys.forEach((key) => {
-            // @ts-ignore
-			if (array[key].day == day){
-                // @ts-ignore
-				result = array[key];
-			}
-		});
-		return result;
-	};*/

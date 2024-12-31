@@ -9,18 +9,15 @@
 	import logo from '$lib/images/examprep.png';
 
 	let range;
-	//let url = 'https://api2.excards.ch/';
-	let url = 'http://localhost:8888/datian-api/';
-	//let rerender = true;
-
 	rangeStore.subscribe((data)=>{
 		range = data;
 	});
+	let url = range.url;
+	let student_selected={};
 
 	let courses = (
 		async () => {
 			let returnvalue={};
-			console.log('load courses');
 			// @ts-ignore
 			if (typeof range.loaded_courses !== 'undefined'){
 				returnvalue.data = {course: [range.loaded_courses.data]};
@@ -29,8 +26,6 @@
 				const response = await fetch(url+`all//`+range.course+`/`+range.start+`/`+range.end);
 				returnvalue = response.json();
 			}
-			console.log(returnvalue);
-			//console.log(returnvalue.data.course[0]);
 			return returnvalue;
 		}
 	)();
@@ -86,6 +81,36 @@
 		range.invoice_text='';
 	}
 
+	let students = (
+		async () => {
+			// @ts-ignore
+			const response = await fetch('https://admin.excards.ch/api/student.php');
+			let data = await response.json();
+			console.log(data);
+			return data;
+		}
+	)()
+
+	async function export2crm(){
+		let body= JSON.stringify(
+			range.export2crm,
+		);
+
+		console.log(range.export2crm)
+
+		const response = await fetch(`https://admin.excards.ch/api/booked.php`,
+                {
+                    method: 'PUT',
+                    body: body,
+                }
+            );
+
+		const result = await response.json();
+		console.log(result);
+		return result;
+	}
+	
+
 	async function save2db () {
 			// @ts-ignore
 			let thiscourses;
@@ -124,16 +149,23 @@
 		//range=saves[save_id];
 		for (const [key, value] of Object.entries(saves_array[save_id].data)) {
     		range[key]=value;
-			console.log(`Key: ${key}, Value: ${value}`);
 		}
 	}
-
-
 </script>
 
 <svelte:window on:keydown={onKeyDown} on:keyup|preventDefault={onKeyUp} />
 
-
+{#await students}
+<p>Lade Studierende... Bitte warten...</p>
+{:then students}
+<div style="margin-top: 2rem">
+	<select bind:value={student_selected}>
+		{#each students as student, student_id}
+		<option value="{parseInt(student_id)}">{student.firstname+' '+student.lastname}</option>
+		{/each}
+	</select>
+	<button style="width: 30%" type="button" on:click={()=>{export2crm()}}>Exportieren</button> 
+</div>
 
 	{#await courses}
 		<p>Lade Kurs {range.course}... Bitte warten...</p>
@@ -142,27 +174,28 @@
 			<p>Lade Kurs Wochen...</p>
 		{:then weeks}
 			{setWeeks(weeks.data.week)}
-			{console.log('weeks')}
-			{console.log(weeks)}
-			<div style="margin-top: 2rem">
+			<!-- Save Funktion (deaktiviert)
+				<div style="margin-top: 2rem">
 				<input style="width: 30%" bind:value={save.name} placeholder="enter your name" />
 				<button style="width: 30%" type="button" on:click={()=>{save2db()}}>Speichern</button> 
-			</div>
+			</div>-->
+
+			<!--Exportfunktion-->
+
+
+
+			<!---   -->
+
+			
 
 			<img class="logo" src={logo} alt="EXAMPREP"/>
 				<input style="margin-top: 80px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
 				Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
-				<!--Kursumfang: 
-				{#if range.selected_visit == range.selected_watch}
-					{range.selected_visit} Lektionen <br/><br/>
-				{:else}
-					{range.selected_visit} Lektionen und {range.selected_watch} Aufzeichnungen.<br/>
-				{/if}-->
 				<br/>
 				<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
-					Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
-					Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
-					Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.
+Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
+Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
+Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.
 				</textarea>
 				
 			{#key range.rerender}
@@ -190,7 +223,7 @@
 			<p>{error}</p>
 		{/await}
 	{/await}
-
+{/await}
 <style>
 
 	*{font-family: 'Roboto', Tahoma, Arial;}

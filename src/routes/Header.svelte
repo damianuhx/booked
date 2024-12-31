@@ -16,20 +16,5 @@
 
 
 <style>
-	header {
-		display: flex;
-		justify-content: space-between;
-	}
 
-	.sticky{
-		position: fixed;
-		background-color: white;
-		width: 100%;
-	}
-
-	@media print {
-		.sticky{
-			display: none;
-		}
-	}
 </style>

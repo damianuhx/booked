@@ -1,6 +1,10 @@
 <script>
-// @ts-nocheck
 
+	//Page: Select
+	//Result: Load 
+	//Table: Wrapper around table 
+	//Row: Rows
+// @ts-nocheck
 	import Result from './Result.svelte';
 	import Row from './Row.svelte';
 	import Table from './Table.svelte';
@@ -13,17 +17,14 @@
 
 	let range;
 	//let url = 'https://api2.excards.ch/';
-	let url = 'http://localhost:8888/datian-api/';
-	//let rerender = true;
 
 	const url_para = $page.url;
-	console.log(url_para.searchParams.get('id'));
 	let student_id = url_para.searchParams.get('id');
-	
 	rangeStore.subscribe((data)=>{
 		range = data;
 	});
-
+	let url = range.url;
+	
 	function setDates(dates){
 		range.dates=dates.data.date;
 	}
@@ -51,6 +52,7 @@
 
 	function transform_saves(saves){
 		let result=saves.data.save;
+		
 		let return_value=[];
 		
 		result.forEach((element) => {
@@ -59,11 +61,14 @@
 				name: element.name,
 				student_id: element.student_id,
 				data: JSON.parse(element.data),
+				courses: JSON.parse(element.courses),
+				weeks: JSON.parse(element.weeks),
 			});
 		});
 		return_value.forEach((element)=>{
 
 		});
+		console.log(return_value)
 		return return_value;
 	}
 
@@ -73,7 +78,6 @@
 		}
 		range.loaded_courses=saves_array[save_id];
 		range.loaded_weeks=saves_array[save_id];
-		console.log(range);
 	}
 
 	let dates = (
@@ -86,30 +90,32 @@
 	
 </script>
 
+
+<!--*************************
+html
+*************************-->
+
+<!-- header -->
 <svelte:head>
 	<title>Kurse</title>
 	<meta name="description" content="KV3" />
 </svelte:head>
 
+<!-- if student is loaded -->
 {#if student_id>0}
 	{#await saves}
 		<p>Bitte warten...</p>
 	{:then saves}
-	{console.log('saves_array')}
-		{console.log(saves_array)}
 		{saves_array=transform_saves(saves)}
-		{console.log(saves_array)}
 		{#await saves_array}
 			<p>Bitte warten...</p>
 		{:then saves_array}
 			<select bind:value={save_selected}>
 				{#each saves_array as option, key}
-				{console.log(option)}
 				<option value="{parseInt(key)}">{option.name}</option>
 				{/each}
 			</select>
 			<button style="width: 300px;" on:click={()=>{
-				console.log(saves_array);
 				save2range(save_selected, saves_array); 
 				range.selected=true; 
 				range.rerender!=range.rerender;
@@ -117,12 +123,12 @@
 		{/await}
 	{/await}
 	{#if range.selected}
-		{console.log(range.course)}{console.log(range)}
-		
 		<Result/>
 	{/if}
+<!-- create new KV -->
 {:else}
 	{#if !range.selected}
+	<!-- select range & course -->
 		{#await course_select}
 		<p>Bitte warten...</p>
 		{:then course_select}
@@ -165,19 +171,16 @@
 	{:catch error}
 			<p>{error}</p>
 		{/await}
+	<!-- display matrix when everything is selected -->
 	{:else}
-	<!--
-	<div style="margin-top: 2rem">
-		<input style="width: 30%" bind:value={save.name} placeholder="enter your name" />
-		<button style="width: 30%" type="button" on:click={()=>{save2db()}}>Speichern</button> 
-	</div>
-	-->
 		<Result/>
 	{/if}
 {/if}
 
 	
-	
+<!--*************************
+footer
+*************************-->
 <footer class="only-printx" style="
 width: 600px;
 position: relative !important; bottom: 0;
@@ -186,72 +189,18 @@ margin-right: 3rem !important;
 padding: 10px;
 border-style: ridge;
 ">
-<div style="width: 100%;font-size: 0.7rem !important;"> <div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Schule:</div> ExamPrep <span class="red">//</span> Bändlistr. 31 <span class="red">//</span> 8064 Zürich </div>
-<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Verwaltung: </div> ExamPrep GmbH <span class="red">//</span> Parkweg 5 <span class="red">//</span> 8800 Thalwil <span class="red">//</span> info@examprep.ch </div>
-<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Kontakt: </div> Tel +41 44 720 06 67 <span class="red">//</span> info@examprep.ch <span class="red">//</span> www.examprep.ch </div>
-<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Bankverbindung: </div> ZKB (Zürcher Kantonalbank) <span class="red">//</span>  8010 Zürich <span class="red">//</span> IBAN: CH22 0070 0110 0026 2134 9 
-<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red"> </div> Swift: ZKBKCHZZ80A <span class="red">//</span> Bankenclearing (BC): 700 <span class="red">//</span>  Post-Konto: 80-151-4</div>
-<img style="margin: 10px;" src="https://pics.excards.ch/eduqua sw.png" height="30" alt="Verband Schweizerischer Privatschulen"/> <img style="margin: 10px;"  src="https://pics.excards.ch/vsp_logo.png" height="30" alt="Verband Schweizerischer Privatschulen"/>
+	<div style="width: 100%;font-size: 0.7rem !important;"> <div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Schule:</div> ExamPrep <span class="red">//</span> Bändlistr. 31 <span class="red">//</span> 8064 Zürich </div>
+	<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Verwaltung: </div> ExamPrep GmbH <span class="red">//</span> Parkweg 5 <span class="red">//</span> 8800 Thalwil <span class="red">//</span> info@examprep.ch </div>
+	<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Kontakt: </div> Tel +41 44 720 06 67 <span class="red">//</span> info@examprep.ch <span class="red">//</span> www.examprep.ch </div>
+	<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red">Bankverbindung: </div> ZKB (Zürcher Kantonalbank) <span class="red">//</span>  8010 Zürich <span class="red">//</span> IBAN: CH22 0070 0110 0026 2134 9 
+	<div style="width: 100%;font-size: 0.7rem !important;"><div style="font-size: 0.7rem !important;margin-bottom: 0 !important" class="lt red"> </div> Swift: ZKBKCHZZ80A <span class="red">//</span> Bankenclearing (BC): 700 <span class="red">//</span>  Post-Konto: 80-151-4</div>
+	<img style="margin: 10px;" src="https://pics.excards.ch/eduqua sw.png" height="30" alt="Verband Schweizerischer Privatschulen"/> <img style="margin: 10px;"  src="https://pics.excards.ch/vsp_logo.png" height="30" alt="Verband Schweizerischer Privatschulen"/>
 </footer>
 
 
 
 <style>
-
-
-.lt {
-        width: 140px; display: inline-block; min-width: 80px; margin-bottom: 10px !important;
-    }
+	.lt {width: 140px; display: inline-block; min-width: 80px; margin-bottom: 10px !important;}
 	.red {color: red}
-
-	*{font-family: 'Roboto', Tahoma, Arial;}
-	.upper-space {height: 50px;}
-
-	.logo{
-		position:absolute;
-		top: 0;
-		right: 0;
-		width: 200px;
-	}
-
-	.title{
-		font-size: 24px;
-		border-style: hidden;
-	}
-
-	.desc{
-		border-style: hidden;
-	}
-
-
-	header {
-		margin-top: -10px;
-		margin-left: -10px;
-		display: flex;
-		justify-content: space-between;
-
-	}
-
-	.sticky{
-		position: fixed;
-		background-color: white;
-		width: 100%;
-		top: 0;
-		left: 0;
-	}
-
-	.only-print{
-			display: none;
-		}
-
-	@media print {
-		.sticky{
-			display: none;
-		}
-		.only-print{
-			display: block;
-		}
-	}
-
 	select{width: 300px;}
 </style>
