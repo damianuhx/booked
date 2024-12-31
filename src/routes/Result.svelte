@@ -87,22 +87,15 @@
 			// @ts-ignore
 			const response = await fetch('https://admin.excards.ch/api/student.php');
 			let data = await response.json();
-			console.log(data);
 			return data;
 		}
 	)()
 
 	async function export2crm(){
-		console.log({
-				amount: range.export_price,
-				product: export_name,
-				comment: range.export_comment,
-				comment2: range.export_comment2, //+ ' \n \n ' + range.invoice_text,
-				student_id: student_selected,
-				range: range.export2crm
-			});
+
 		let body= JSON.stringify(
 			{
+				token: '4Lq18hYEzpBrK1j9AOT',
 				amount: range.export_price,
 				product: export_name,
 				comment: range.export_comment,
@@ -112,8 +105,6 @@
 			}
 		);
 
-		console.log(range.export2crm)
-
 		const response = await fetch(`https://admin.excards.ch/api/booked.php`,
                 {
                     method: 'PUT',
@@ -122,7 +113,11 @@
             );
 
 		const result = await response.json();
-		console.log(result);
+		
+		range.invoice.id=await result.invoice_id;
+		range.invoice.student_id=await result.student_id;
+		range.invoice.name=await result.invoice_name;
+
 		return result;
 	}
 	
@@ -174,7 +169,8 @@
 {#await students}
 <p>Lade Studierende... Bitte warten...</p>
 {:then students}
-<div style="margin-top: 2rem">
+
+<div class="no-print" style="margin-top: 2rem">
 	<input type="text" bind:value={export_name} />
 	<select bind:value={student_selected}>
 		{#each students as student, student_id}
@@ -182,6 +178,9 @@
 		{/each}
 	</select>
 	<button style="width: 30%" type="button" on:click={()=>{export2crm()}}>Exportieren</button> 
+	{#if range.invoice.id>0}
+		<a target="_blank" href="https://admin.excards.ch/invoices.php?id={range.invoice.student_id}#{range.invoice.id}">Rechnung #{range.invoice.id}: <b>{range.invoice.name}</b> S:{range.invoice.student_id}</a>
+	{/if}
 </div>
 
 	{#await courses}
@@ -231,10 +230,9 @@
 					<div class="upper-space"></div>
 				</header>
 				<Table {courses}/>
-				{console.log(range)}
 			{/key}
 			<br/><textarea class="desc" id="w3review" name="w3review" cols="149">
-			Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
+Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
 				</textarea>
 				<br/>
 		{:catch error}
@@ -287,6 +285,9 @@
 	}
 
 	@media print {
+		.no-print{
+			display: none
+		}
 		.sticky{
 			display: none;
 		}
