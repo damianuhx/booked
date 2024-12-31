@@ -317,7 +317,8 @@
 		//export
 		if (typeof subject.subject !== 'undefined' && typeof subject.subject.id !== 'undefined') {
 			range.export2crm[subject.subject.id]=[];
-			
+			range.export_comment2 += '';
+
 			if (typeof subject.data === 'object' && !Array.isArray(subject.data) && subject.data !== null){
 				Object.keys(subject.data).forEach(key => {
 					  range.export2crm[subject.subject.id][key]={};
@@ -593,8 +594,6 @@
 {#if layer==0 && typeof subject.global !== 'undefined'}
 <div class="hr" style=""></div><br/>
 
-
-
 <div class="public-row title">
 	<div aria-hidden=true class="name sum pad1">
 		Total
@@ -609,8 +608,8 @@
 	</div>
 	<div class="start sum"> {range.week_start(subject.global.start_all)} </div> 
 	<div class="start sum"> {range.week_end(subject.global.end_all)} </div>
-	<div class="sum-price sum">	 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(subject.global.p_all)} </div>
-	<br/><br/>
+	<div class="sum-price sum">	 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(range.export_price =(Math.floor(subject.global.p_all*20)/20).toFixed(2))} </div>
+	<br/>
 </div>
 
 <div class="hr" style=""></div>

@@ -17,7 +17,11 @@ let rangeStore = writable(
         rerender: true,
         reheader: true,
         weeks: [],
+        //export
         export2crm: [],
+        export_price: 0,
+        export_comment: '', //intern
+        export_comment2: '', //extern
         all: function () {
             let value = [];
             for (let i = this.start; i<=this.end; i++){

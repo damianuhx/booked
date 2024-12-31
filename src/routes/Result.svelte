@@ -9,6 +9,7 @@
 	import logo from '$lib/images/examprep.png';
 
 	let range;
+	let export_name='KV';
 	rangeStore.subscribe((data)=>{
 		range = data;
 	});
@@ -92,8 +93,21 @@
 	)()
 
 	async function export2crm(){
+		console.log({amount: range.export_price,
+				product: export_name,
+				comment: range.export_comment2 + ' \n \n ' + range.invoice_text,
+				comment2: range.invoice_text,
+				student_id: student_selected,
+				range: range.export2crm});
 		let body= JSON.stringify(
-			range.export2crm,
+			{
+				amount: range.export_price,
+				product: export_name,
+				comment: range.export_comment2 + ' \n \n ' + range.invoice_text,
+				comment2: range.invoice_text,
+				student_id: student_selected,
+				range: range.export2crm,
+			}
 		);
 
 		console.log(range.export2crm)
@@ -159,6 +173,7 @@
 <p>Lade Studierende... Bitte warten...</p>
 {:then students}
 <div style="margin-top: 2rem">
+	<input type="text" bind:value={export_name} />
 	<select bind:value={student_selected}>
 		{#each students as student, student_id}
 		<option value="{parseInt(student_id)}">{student.firstname+' '+student.lastname}</option>
@@ -192,10 +207,10 @@
 				<input style="margin-top: 80px" class="title" type="text" value="Vorbereitungskurs für die {courses.data.course[0].name}"><br/>
 				Kursdauer: {range.week_start(range.selected_start)} bis {range.week_end(range.selected_end)}<br/>
 				<br/>
+				<div style="display: none">{range.export_comment="Vorbereitungskurs für die "+courses.data.course[0].name+" mit Kursdauer von "+range.week_start(range.selected_start)+" bis "+range.week_end(range.selected_end)}</div>
+				
 				<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
-Dieser Kurs bereitet Sie für die {courses.data.course[0].name} vor. 
-Die enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. 
-Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.
+{range.export_comment2="Dieser Kurs bereitet Sie für die "+courses.data.course[0].name+" vor. \nDie enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. \nBei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen."}
 				</textarea>
 				
 			{#key range.rerender}
@@ -214,6 +229,7 @@ Bei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegrif
 					<div class="upper-space"></div>
 				</header>
 				<Table {courses}/>
+				{console.log(range)}
 			{/key}
 			<br/><textarea class="desc" id="w3review" name="w3review" cols="149">
 			Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
