@@ -284,33 +284,43 @@
 		if (!subject.children.length){
 			if (subject.global.n_visit+subject.global.n_watch>0 || subject.global.self && subject.global.p_self){
 				range.invoice_text+= subject.name;
+				range.export_comment2+= subject.name;
 				
 				if (subject.global.n_visit+subject.global.n_watch>0){
 					range.invoice_text+=' Lektionen';
+					range.export_comment2+=' Lektionen';
 				}
 				range.invoice_text+= ': ';
+				range.export_comment2+= ': ';
 				if (subject.global.n_visit==subject.global.n_watch){
 					range.invoice_text+=subject.global.n_visit+' ';
+					range.export_comment2+=subject.global.n_visit+' ';
 				}
 				else{
 					if (subject.global.n_visit>0){
 						range.invoice_text+=subject.global.n_visit+' Präsenz ';
+						range.export_comment2+=subject.global.n_visit+' Präsenz ';	
 					}
 					if (subject.global.n_visit>0 && subject.global.n_watch>0){
 						range.invoice_text+=' & ';
+						range.export_comment2+=' & ';
 					}
 					if (subject.global.n_watch>0){
 						range.invoice_text+=subject.global.n_watch+' Aufzeichnungen ';
+						range.export_comment2+=subject.global.n_watch+' Aufzeichnungen ';
 					}
 				}
 				if (subject.global.n_visit+subject.global.n_watch>0){
 					range.invoice_text+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
+					range.export_comment2+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
 				}
 				
 				if (subject.global.self  && subject.global.p_self){
 					range.invoice_text+= ', Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
+					range.export_comment2+= ', Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
 				}
 				range.invoice_text+= '<span style="color: red"> // </span> <br/>';
+				range.export_comment2+= '\n';
 			}
 		}
 

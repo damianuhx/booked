@@ -93,20 +93,22 @@
 	)()
 
 	async function export2crm(){
-		console.log({amount: range.export_price,
+		console.log({
+				amount: range.export_price,
 				product: export_name,
-				comment: range.export_comment2 + ' \n \n ' + range.invoice_text,
-				comment2: range.invoice_text,
+				comment: range.export_comment,
+				comment2: range.export_comment2, //+ ' \n \n ' + range.invoice_text,
 				student_id: student_selected,
-				range: range.export2crm});
+				range: range.export2crm
+			});
 		let body= JSON.stringify(
 			{
 				amount: range.export_price,
 				product: export_name,
-				comment: range.export_comment2 + ' \n \n ' + range.invoice_text,
-				comment2: range.invoice_text,
+				comment: range.export_comment,
+				comment2: range.export_comment2, //+ ' \n \n ' + range.invoice_text,
 				student_id: student_selected,
-				range: range.export2crm,
+				range: range.export2crm
 			}
 		);
 
@@ -176,7 +178,7 @@
 	<input type="text" bind:value={export_name} />
 	<select bind:value={student_selected}>
 		{#each students as student, student_id}
-		<option value="{parseInt(student_id)}">{student.firstname+' '+student.lastname}</option>
+		<option value="{parseInt(student.id)}">{student.firstname+' '+student.lastname}</option>
 		{/each}
 	</select>
 	<button style="width: 30%" type="button" on:click={()=>{export2crm()}}>Exportieren</button> 
@@ -210,7 +212,7 @@
 				<div style="display: none">{range.export_comment="Vorbereitungskurs für die "+courses.data.course[0].name+" mit Kursdauer von "+range.week_start(range.selected_start)+" bis "+range.week_end(range.selected_end)}</div>
 				
 				<textarea class="desc" id="w3review" name="w3review" rows="4" cols="50">
-{range.export_comment2="Dieser Kurs bereitet Sie für die "+courses.data.course[0].name+" vor. \nDie enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. \nBei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen."}
+{range.export_comment2="Dieser Kurs bereitet Sie für die "+courses.data.course[0].name+" vor. \nDie enthaltenen Fächer sowie deren Anzahl Lektionen und Aufzeichnungen können Sie der nachfolgenden Tabelle entnehmen. \nBei allen Fächern ist der Zugang zum Lernsystem mit den Lernunterlagen inbegriffen.\n\n"}
 				</textarea>
 				
 			{#key range.rerender}
