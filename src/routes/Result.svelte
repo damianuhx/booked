@@ -93,6 +93,7 @@
 
 	async function export2crm(){
 
+		console.log(courses);
 		let body= JSON.stringify(
 			{
 				token: '4Lq18hYEzpBrK1j9AOT',
@@ -117,6 +118,8 @@
 		range.invoice.id=await result.invoice_id;
 		range.invoice.student_id=await result.student_id;
 		range.invoice.name=await result.invoice_name;
+
+		console.log(result);
 
 		return result;
 	}

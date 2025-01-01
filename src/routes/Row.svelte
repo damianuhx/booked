@@ -333,9 +333,9 @@
 				Object.keys(subject.data).forEach(key => {
 					  range.export2crm[subject.subject.id][key]={};
 
-					  range.export2crm[subject.subject.id][key].visit=subject.data[key].b_visit && subject.data[key].parent_visit;
-					  range.export2crm[subject.subject.id][key].watch=subject.data[key].b_watch && subject.data[key].parent_watch; 
-					  range.export2crm[subject.subject.id][key].self=subject.data[key].b_self && subject.data[key].parent_self;
+					  range.export2crm[subject.subject.id][key].visit = +(parent_global.visit && subject.global.visit && subject.data[key].b_visit && subject.data[key].parent_visit)*subject.data[key].n_visit;
+					  range.export2crm[subject.subject.id][key].watch = +(parent_global.watch && subject.global.watch && subject.data[key].b_watch && subject.data[key].parent_watch)*subject.data[key].n_watch; 
+					  range.export2crm[subject.subject.id][key].self  = +(parent_global.self  && subject.global.self && subject.data[key].b_self && subject.data[key].parent_self);
 				});
 			}
 		}
