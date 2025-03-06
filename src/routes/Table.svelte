@@ -17,7 +17,7 @@
 
 
     <div class="table">
-        <Row bind:subject={courses.data.course[0]} layer={0} show=true parent_global={{visit: true, watch: true, self: true}}/>
+        <Row bind:subject={courses.data.course[0]} layer={0} show=true parent_global={{all: true, visit: true, watch: true, self: true}}/>
      </div>
 
 

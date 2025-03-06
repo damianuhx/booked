@@ -203,7 +203,7 @@
 				child.data[index].parent_visit=subject.data[index].parent_visit && subject.data[index].b_visit;
 				child.data[index].parent_watch=subject.data[index].parent_watch && subject.data[index].b_watch;
 				child.data[index].parent_self=subject.data[index].parent_self && subject.data[index].b_self;
-
+				
 				subject.data[index].n_visit += child.data[index].n_visit*child.global.visit*child.global.all*child.data[index].b_visit;//*parent_global.visit;
 				subject.data[index].n_watch += child.data[index].n_watch*child.global.watch*child.global.all*child.data[index].b_watch;//*parent_global.watch;
 				subject.data[index].p_self += child.data[index].p_self*child.global.self*child.global.all*child.data[index].b_self;//*parent_global.self;
@@ -264,7 +264,7 @@
 		subject.global.start_watch = range.min(subject.data, 'b_watch');
 		subject.global.end_watch = range.max(subject.data, 'b_watch');
 		subject.global.start_self = range.min(subject.data, 'b_self');
-		subject.global.end_self = range.max(subject.data, 'b_self')+6; //4 extrawochen im lernsystem
+		subject.global.end_self = range.max(subject.data, 'b_self');
 		if (subject.global.n_visit>0 || subject.global.n_watch>0){
 			subject.global.start_all = Math.min(subject.global.start_visit, subject.global.start_watch);
 			subject.global.end_all = Math.max(subject.global.end_visit, subject.global.end_watch);
@@ -282,42 +282,49 @@
 		}
 
 		if (!subject.children.length){
-			if (subject.global.n_visit+subject.global.n_watch>0 || subject.global.self && subject.global.p_self){
+			if ( subject.global.all && parent_global.all && (subject.global.n_visit*subject.global.visit+subject.global.n_watch*subject.global.watch>0 || subject.global.self && subject.global.p_self)){
 				range.invoice_text+= subject.name;
 				range.export_comment2+= subject.name;
-				
-				if (subject.global.n_visit+subject.global.n_watch>0){
-					range.invoice_text+=' Lektionen';
-					range.export_comment2+=' Lektionen';
-				}
-				range.invoice_text+= ': ';
-				range.export_comment2+= ': ';
-				if (subject.global.n_visit==subject.global.n_watch){
-					range.invoice_text+=subject.global.n_visit+' ';
-					range.export_comment2+=subject.global.n_visit+' ';
-				}
-				else{
-					if (subject.global.n_visit>0){
-						range.invoice_text+=subject.global.n_visit+' Präsenz ';
-						range.export_comment2+=subject.global.n_visit+' Präsenz ';	
+				//range.invoice_text+= subject.global.visit;
+
+				if (subject.global.n_visit*subject.global.visit+subject.global.n_watch*subject.global.watch>0){
+					if (subject.global.n_visit+subject.global.n_watch>0){
+						range.invoice_text+=' Lektionen';
+						range.export_comment2+=' Lektionen';
 					}
-					if (subject.global.n_visit>0 && subject.global.n_watch>0){
-						range.invoice_text+=' & ';
-						range.export_comment2+=' & ';
+					range.invoice_text+= ': ';
+					range.export_comment2+= ': ';
+					if (subject.global.n_visit*subject.global.visit==subject.global.n_watch*subject.global.watch){
+						range.invoice_text+=subject.global.n_visit+' ';
+						range.export_comment2+=subject.global.n_visit+' ';
 					}
-					if (subject.global.n_watch>0){
-						range.invoice_text+=subject.global.n_watch+' Aufzeichnungen ';
-						range.export_comment2+=subject.global.n_watch+' Aufzeichnungen ';
+					else{
+						if (subject.global.n_visit*subject.global.visit>0){
+							range.invoice_text+=subject.global.n_visit+' Präsenz ';
+							range.export_comment2+=subject.global.n_visit+' Präsenz ';	
+						}
+						if (subject.global.n_visit*subject.global.visit>0 && subject.global.n_watch*subject.global.watch>0){
+							range.invoice_text+=' & ';
+							range.export_comment2+=' & ';
+						}
+						if (subject.global.n_watch*subject.global.watch>0){
+							range.invoice_text+=subject.global.n_watch+' Aufzeichnungen ';
+							range.export_comment2+=subject.global.n_watch+' Aufzeichnungen ';
+						}
 					}
-				}
-				if (subject.global.n_visit+subject.global.n_watch>0){
-					range.invoice_text+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
-					range.export_comment2+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
+					if (subject.global.n_visit+subject.global.n_watch>0){
+						range.invoice_text+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
+						range.export_comment2+='('+range.week_start(subject.global.start_all)+' bis '+range.week_end(subject.global.end_all)+')'
+					}
+					if (subject.global.self  && subject.global.p_self){
+						range.invoice_text+= ',';
+						range.export_comment2+= ',';
+					}
 				}
 				
 				if (subject.global.self  && subject.global.p_self){
-					range.invoice_text+= ', Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
-					range.export_comment2+= ', Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
+					range.invoice_text+= ' Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
+					range.export_comment2+= ' Lernportal: '+range.week_start(subject.global.start_self)+' bis '+range.week_end(subject.global.end_self);
 				}
 				range.invoice_text+= '<span style="color: red"> // </span> <br/>';
 				range.export_comment2+= '\n';
@@ -335,7 +342,7 @@
 
 					  range.export2crm[subject.subject.id][key].visit = +(parent_global.visit && subject.global.visit && subject.data[key].b_visit && subject.data[key].parent_visit)*subject.data[key].n_visit;
 					  range.export2crm[subject.subject.id][key].watch = +(parent_global.watch && subject.global.watch && subject.data[key].b_watch && subject.data[key].parent_watch)*subject.data[key].n_watch; 
-					  range.export2crm[subject.subject.id][key].self  = +(parent_global.self  && subject.global.self && subject.data[key].b_self && subject.data[key].parent_self);
+					  range.export2crm[subject.subject.id][key].self  = +(parent_global.self  && subject.global.self && subject.data[key].b_self && subject.data[key].parent_self && (subject.subject.price_base>0));
 				});
 			}
 		}
@@ -500,13 +507,13 @@
 
 
 {#each subject.children as child}
-	<Row bind:subject={child} layer={layer+1} show={subject.show && show && subject.global.all} parent_global={{visit: parent_global.visit && subject.global && subject.global.visit, watch: parent_global.watch && subject.global && subject.global.watch, self: parent_global.self && subject.global && subject.global.self}} />	 
+	<Row bind:subject={child} layer={layer+1} show={subject.show && show && subject.global.all} parent_global={{all: parent_global.all && subject.global && subject.global.all, visit: parent_global.visit && subject.global && subject.global.visit, watch: parent_global.watch && subject.global && subject.global.watch, self: parent_global.self && subject.global && subject.global.self}} />	 
 {/each}
 
 
 
 
-<!--Duplicate from above-->
+<!--Duplicate from above Last Line which is summary--> 
 {#if typeof subject.global !== 'undefined' && layer==0 && range.show && range.intern}
 <div class="hr" style=""></div>
 
@@ -595,6 +602,10 @@
 		{/if}
 	{/if}
 </div>
+
+<div>
+	<!-- List of Products comes here-->
+</div>
 {/if}
 <!--END Duplicate-->
 
@@ -622,7 +633,7 @@
 	<br/>
 </div>
 
-<div class="hr" style=""></div>
+<div style="margin-top: 10px;" class="hr"></div>
 <div class="hr" style=""></div>
 <br/>
 

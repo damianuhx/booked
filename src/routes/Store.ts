@@ -3,7 +3,7 @@ import { writable } from 'svelte/store'
 let rangeStore = writable(
     {
         url: 'http://localhost:8888/datian-api/', 
-        urlx: 'https://api2.excards.ch/', 
+        //url: 'https://api2.excards.ch/', 
         course: 13,
         start: 86,
         end: 106,

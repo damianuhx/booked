@@ -19,7 +19,7 @@
 	//let url = 'https://api2.excards.ch/';
 
 	const url_para = $page.url;
-	let student_id = url_para.searchParams.get('id');
+	let student_id = 0;//url_para.searchParams.get('id');
 	rangeStore.subscribe((data)=>{
 		range = data;
 	});

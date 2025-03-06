@@ -234,8 +234,9 @@
 				</header>
 				<Table {courses}/>
 			{/key}
-			<br/><textarea class="desc" id="w3review" name="w3review" cols="149">
+			<br/><textarea class="desc" id="w3review" name="w3review" rows="6" cols="149">
 Dieser Kostenvoranschlag wurde erstellt für ... und ist gültig bis zum {Intl.DateTimeFormat('de-CH').format(new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000))}.
+Der Zugang zum Lernportal während den Prüfungen ist gewährleistet.
 				</textarea>
 				<br/>
 		{:catch error}
