@@ -13,6 +13,7 @@
 		    range = data;
 	    });
 
+        range.subject_ids = [];
     </script>
 
 

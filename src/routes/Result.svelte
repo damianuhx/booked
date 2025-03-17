@@ -40,6 +40,14 @@
 		}
 	)();
 
+	let products = (
+		async () => {
+			// @ts-ignore
+			const response = await fetch(url+`product`)
+			return response.json()
+		}
+	)();
+
 	function setWeeks(weeks){
 		range.weeks=[];
 		weeks.forEach((element) => {
@@ -53,6 +61,11 @@
 				range.weeks[element.week].exit = element.name;
 			}
 		});
+		return '';
+	}
+
+	function setProducts(products){
+		range.products = products;
 		return '';
 	}
 
@@ -165,6 +178,7 @@
     		range[key]=value;
 		}
 	}
+
 </script>
 
 <svelte:window on:keydown={onKeyDown} on:keyup|preventDefault={onKeyUp} />
@@ -193,6 +207,13 @@
 			<p>Lade Kurs Wochen...</p>
 		{:then weeks}
 			{setWeeks(weeks.data.week)}
+			{#await products}
+				<p>Lade Produkte...</p>
+			{:then products}
+				
+				{setProducts(products.data.product)}
+			
+			{/await}
 			<!-- Save Funktion (deaktiviert)
 				<div style="margin-top: 2rem">
 				<input style="width: 30%" bind:value={save.name} placeholder="enter your name" />

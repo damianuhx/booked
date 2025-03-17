@@ -17,6 +17,9 @@ let rangeStore = writable(
         rerender: true,
         reheader: true,
         weeks: [],
+        products: [],
+        subject_ids: [],
+        products_selection: [],
         //export
         invoice: {
             id: 0,
@@ -24,6 +27,8 @@ let rangeStore = writable(
             student_name: '',
         },
         export2crm: [],
+        course_price: 0,
+        product_price: 0,
         export_price: 0,
         export_comment: '', //intern
         export_comment2: '', //extern

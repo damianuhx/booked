@@ -279,6 +279,21 @@
 			range.selected_end=subject.global.end_all;
 			range.selected_visit=subject.global.n_visit;
 			range.selected_watch=subject.global.n_watch;
+
+			//adding products matching subjects
+			range.products_selection=[];
+			range.subject_ids.forEach(
+				(id)=>{
+					range.products.forEach((product)=>{
+						if (parseInt(product.subject.id) == id){
+							range.products_selection.push(product);
+						}
+					})
+				})
+				console.log(range.products_selection);
+			//only push to subject_ids if subjectprice is > 0
+			//add products to total value here
+			console.log('ONCE?');
 		}
 
 		if (!subject.children.length){
@@ -335,11 +350,16 @@
 		if (typeof subject.subject !== 'undefined' && typeof subject.subject.id !== 'undefined') {
 			range.export2crm[subject.subject.id]=[];
 			range.export_comment2 += '';
-
+			
+			
 			if (typeof subject.data === 'object' && !Array.isArray(subject.data) && subject.data !== null){
+				const exists = range.subject_ids.includes(subject.subject.id);
+			if (!exists && subject.global.all) {
+				range.subject_ids.push(subject.subject.id);
+			}
+			//range.subject_ids.push(subject.subject.id); //add subject id to global list for products
 				Object.keys(subject.data).forEach(key => {
 					  range.export2crm[subject.subject.id][key]={};
-
 					  range.export2crm[subject.subject.id][key].visit = +(parent_global.visit && subject.global.visit && subject.data[key].b_visit && subject.data[key].parent_visit)*subject.data[key].n_visit;
 					  range.export2crm[subject.subject.id][key].watch = +(parent_global.watch && subject.global.watch && subject.data[key].b_watch && subject.data[key].parent_watch)*subject.data[key].n_watch; 
 					  range.export2crm[subject.subject.id][key].self  = +(parent_global.self  && subject.global.self && subject.data[key].b_self && subject.data[key].parent_self && (subject.subject.price_base>0));
@@ -602,17 +622,28 @@
 		{/if}
 	{/if}
 </div>
-
-<div>
-	<!-- List of Products comes here-->
-</div>
-{/if}
 <!--END Duplicate-->
+
+{/if}
+
 
 
 
 
 {#if layer==0 && typeof subject.global !== 'undefined'}
+
+<div class="hr" style=""></div><br/>
+
+<div>
+	{#each range.subject_ids as id}
+		{id} <br/>
+	{/each}
+	{#each range.products as product}
+		{product.name}
+	{/each}
+</div>
+
+
 <div class="hr" style=""></div><br/>
 
 <div class="public-row title">
@@ -628,7 +659,7 @@
 		{/if}
 	</div>
 	<div class="start sum"> {range.week_start(subject.global.start_all)} </div> 
-	<div class="start sum"> {range.week_end(subject.global.end_all)} </div>
+	<div class="start sum"> {range.week_end(subject.global.end_all)} </div> {range.product_price}
 	<div class="sum-price sum">	 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(range.export_price =(Math.floor(subject.global.p_all*20)/20).toFixed(2))} </div>
 	<br/>
 </div>
