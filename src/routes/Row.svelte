@@ -162,7 +162,7 @@
 				if (typeof subject.data[index].n_visit == 'undefined'){subject.data[index].n_visit=subject.subject.grid[index] || 0;}
 				if (typeof subject.data[index].n_watch == 'undefined'){subject.data[index].n_watch=subject.subject.grid[index] || 0;}
 				//prices
-				subject.data[index].p_self=(Math.round(parseFloat(subject.subject.price_base * 0.01 || 0) *100))/100 ;
+				subject.data[index].p_self=(Math.round(parseFloat(subject.subject.price_base * 0.02 || 0) *100))/100 ; //change weekly fee for excards here
 				subject.data[index].p_visit=parseFloat(subject.subject.price_lesson * 0.5 * subject.data[index].n_visit  || 0) ;
 				subject.data[index].p_watch=parseFloat(subject.subject.price_lesson * 0.5 * subject.data[index].n_watch  || 0) ;
 			}
@@ -282,18 +282,28 @@
 
 			//adding products matching subjects
 			range.products_selection=[];
+			range.product_price=0;
+			range.products.forEach((product)=>{
+						if (product.subject.id == null){
+							range.products_selection.push(product);
+							range.product_price+=product.price*product.units;
+							range.invoice_text+= product.units + ' x ' + product.name+'<span style="color: red"> // </span> <br/>';
+							range.export_comment2+= product.units + ' x ' + product.name+"\n";
+						}
+					})
 			range.subject_ids.forEach(
 				(id)=>{
 					range.products.forEach((product)=>{
 						if (parseInt(product.subject.id) == id){
 							range.products_selection.push(product);
+							range.product_price+=product.price*product.units;
+							range.invoice_text+= product.units + ' x ' + product.name+'<span style="color: red"> // </span> <br/>';
+							range.export_comment2+= product.units + ' x ' + product.name+"\n";
 						}
 					})
 				})
-				console.log(range.products_selection);
-			//only push to subject_ids if subjectprice is > 0
-			//add products to total value here
-			console.log('ONCE?');
+				
+			//add products to total value *here*
 		}
 
 		if (!subject.children.length){
@@ -632,23 +642,31 @@
 
 {#if layer==0 && typeof subject.global !== 'undefined'}
 
+
+
+
 <div class="hr" style=""></div><br/>
 
-<div>
-	{#each range.subject_ids as id}
-		{id} <br/>
-	{/each}
-	{#each range.products as product}
-		{product.name}
-	{/each}
+<div style="">
+	<div aria-hidden=true class="name sum pad1">
+		Pro Woche
+	</div>
+		<div class="sum-lesson sum ">
+			{#if subject.global.n_visit>0 && subject.global.visit}
+				<div class="sumpart {bool2noprint(!range.show)}">{Math.round(subject.global.n_visit/range.week_duration())}<img class="icon" src={visit} alt=""/> </div>
+			{/if}
+			{#if subject.global.n_watch>0 && subject.global.watch}
+				<div class="sumpart {bool2noprint(!range.show)}">{Math.round(subject.global.n_watch/range.week_duration())} <img class="icon" src={watch} alt=""/> </div>
+			{/if}
+		</div>
+		<div class="start sum">{range.week_duration()} Wochen </div>
+		<div class="start sum">zu je </div>
+		<div class="sum-price sum">{range.price_format(subject.global.p_all/(range.selected_end - range.selected_start))}</div>
 </div>
-
-
-<div class="hr" style=""></div><br/>
 
 <div class="public-row title">
 	<div aria-hidden=true class="name sum pad1">
-		Total
+		Total Kurse
 	</div>
 	<div class="sum-lesson sum ">
 		{#if subject.global.n_visit>0 && subject.global.visit}
@@ -659,7 +677,7 @@
 		{/if}
 	</div>
 	<div class="start sum"> {range.week_start(subject.global.start_all)} </div> 
-	<div class="start sum"> {range.week_end(subject.global.end_all)} </div> {range.product_price}
+	<div class="start sum"> {range.week_end(subject.global.end_all)} </div>
 	<div class="sum-price sum">	 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(range.export_price =(Math.floor(subject.global.p_all*20)/20).toFixed(2))} </div>
 	<br/>
 </div>
@@ -668,6 +686,58 @@
 <div class="hr" style=""></div>
 <br/>
 
+
+
+<!--List all products with number-input *here*-->
+
+<div class="{range.print_if_value(range.product_price)}">
+	{#each range.products_selection as product}
+	<span class="{range.print_if_value(product.units)}">
+	<div aria-hidden=true class="name sum pad1">
+		<input class="units no-print" bind:value={product.units} /> 
+		{product.name} 
+	</div>
+	<div class="sum-lesson sum">
+		{product.units} Einheiten
+	</div>
+	<div class="start sum">
+		zu je
+	</div>
+	<div class="start sum">
+		{range.price_format(product.price)} 
+	</div>
+	<div class="sum-price sum">
+		<b>{range.price_format(product.units*product.price)}</b>
+	</div>
+	<br/>
+</span>
+	{/each}
+	<br/>
+	<div class="hr" style=""></div><br/>
+
+<div class="public-row title">
+	<div aria-hidden=true class="name sum pad1">
+		Total Produkte
+	</div>
+	<div class="sum-lesson sum ">
+		
+	</div>
+	<div class="start sum">  </div> 
+	<div class="start sum"> </div>
+	<div class="sum-price sum">	 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(range.product_price =(Math.floor(range.product_price*20)/20).toFixed(2))} </div>
+	
+</div>
+<div style="margin-top: 10px;" class="hr"></div>
+<div class="hr" style=""></div>
+<br/>
+</div>
+
+
+
+<br/>
+
+
+
 <span class="no-print">{@html range.invoice_text.substring(0, range.invoice_text.length - 42)}</span>
 {/if}
 
@@ -675,6 +745,11 @@
 
 
 <style>
+	.units{
+		margin-left: -20px;
+		width: 20px;
+		text-align: right;
+	}
 	*{font-family: 'Roboto', Tahoma, Arial;}
 	.upper-space {height: 50px;}
 

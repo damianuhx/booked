@@ -16,7 +16,6 @@
 	import { page } from '$app/stores';
 
 	let range;
-	//let url = 'https://api2.excards.ch/';
 
 	const url_para = $page.url;
 	let student_id = 0;//url_para.searchParams.get('id');
@@ -68,7 +67,6 @@
 		return_value.forEach((element)=>{
 
 		});
-		console.log(return_value)
 		return return_value;
 	}
 

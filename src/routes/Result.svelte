@@ -105,12 +105,10 @@
 	)()
 
 	async function export2crm(){
-
-		console.log(courses);
 		let body= JSON.stringify(
 			{
 				token: '4Lq18hYEzpBrK1j9AOT',
-				amount: range.export_price,
+				amount: parseFloat(range.export_price)+parseFloat(range.product_price),
 				product: export_name,
 				comment: range.export_comment,
 				comment2: range.export_comment2, //+ ' \n \n ' + range.invoice_text,
@@ -131,8 +129,6 @@
 		range.invoice.id=await result.invoice_id;
 		range.invoice.student_id=await result.student_id;
 		range.invoice.name=await result.invoice_name;
-
-		console.log(result);
 
 		return result;
 	}

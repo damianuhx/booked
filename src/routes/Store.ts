@@ -2,8 +2,8 @@ import { writable } from 'svelte/store'
 
 let rangeStore = writable(
     {
-        url: 'http://localhost:8888/datian-api/', 
-        //url: 'https://api2.excards.ch/', 
+        //url: 'http://localhost:8888/datian-api/', 
+        url: 'https://api2.excards.ch/', 
         course: 13,
         start: 86,
         end: 106,
@@ -13,18 +13,36 @@ let rangeStore = writable(
         selected_watch: 0,
         selected: false,
         show: true,
-        intern: true,
+        intern: false,
         rerender: true,
         reheader: true,
         weeks: [],
         products: [],
         subject_ids: [],
         products_selection: [],
+        add_invoice_text: function (text: string){
+            this.invoice_text+=text;
+            this.export_comment2+=text;
+        },
+        week_duration: function(){
+            return this.selected_end - this.selected_start;
+        },
+        print_if_value: function (value: number){
+            if (value<=0){
+                return 'no-print';
+            }
+            else{
+                return '';
+            }
+        },
         //export
         invoice: {
             id: 0,
             student_id: 0,
             student_name: '',
+        },
+        price_format: function(input: number) {
+            return new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(Math.floor(input*20)/20);
         },
         export2crm: [],
         course_price: 0,
